@@ -5,7 +5,8 @@
       "botania:pebble": 1,
       "botania:living_root": 1,
       "botania:life_essence": 256,
-      "botania:ender_air_bottle": 1024
+      "botania:ender_air_bottle": 1024,
+      "BOTANIA_MANA": 1
     }
   }
 }

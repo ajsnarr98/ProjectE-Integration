@@ -143,22 +143,22 @@ public class ImmersiveEngineeringAddon {
 
         @Override
         public NSSOutput getOutput(CokeOvenRecipe recipe) {
-            if (recipe.creosoteOutput > 0) {
-                ItemStack itemOutput = recipe.getResultItem().copy();
-                FluidStack creosoteOutput = new FluidStack(IEFluids.CREOSOTE.getBlock().getFluid(), recipe.creosoteOutput);
-                NormalizedSimpleStack itemStack = NSSItem.createItem(itemOutput);
-                NormalizedSimpleStack fluidStack = NSSFluid.createFluid(creosoteOutput);
-
-                Tuple<NormalizedSimpleStack, Boolean> group = getFakeGroup(fluidStack, itemStack);
-                NormalizedSimpleStack dummy = group.getA();
-                Map<NormalizedSimpleStack, Integer> dummyMap = Utils.getDummyMap(dummy);
-
-                mapper.addConversion(creosoteOutput.getAmount(), fluidStack, dummyMap);
-                mapper.addConversion(itemOutput.getCount(), itemStack, dummyMap);
-                return new NSSOutput(2, dummy);
-            } else {
+//            if (recipe.creosoteOutput > 0) {
+//                ItemStack itemOutput = recipe.getResultItem().copy();
+//                FluidStack creosoteOutput = new FluidStack(IEFluids.CREOSOTE.getBlock().getFluid(), recipe.creosoteOutput);
+//                NormalizedSimpleStack itemStack = NSSItem.createItem(itemOutput);
+//                NormalizedSimpleStack fluidStack = NSSFluid.createFluid(creosoteOutput);
+//
+//                Tuple<NormalizedSimpleStack, Boolean> group = getFakeGroup(fluidStack, itemStack);
+//                NormalizedSimpleStack dummy = group.getA();
+//                Map<NormalizedSimpleStack, Integer> dummyMap = Utils.getDummyMap(dummy);
+//
+//                mapper.addConversion(creosoteOutput.getAmount(), fluidStack, dummyMap);
+//                mapper.addConversion(itemOutput.getCount(), itemStack, dummyMap);
+//                return new NSSOutput(2, dummy);
+//            } else {
                 return new NSSOutput(recipe.getResultItem());
-            }
+//            }
         }
     }
 
