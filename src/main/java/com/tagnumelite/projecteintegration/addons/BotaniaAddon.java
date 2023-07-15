@@ -34,8 +34,11 @@ import moze_intel.projecte.api.data.CustomConversionBuilder;
 import moze_intel.projecte.api.imc.IMCMethods;
 import moze_intel.projecte.api.imc.NSSCreatorInfo;
 import moze_intel.projecte.api.mapper.recipe.RecipeTypeMapper;
+import moze_intel.projecte.api.nss.AbstractNSSTag;
 import moze_intel.projecte.api.nss.NormalizedSimpleStack;
+import moze_intel.projecte.api.nss.NSSFake;
 import moze_intel.projecte.emc.IngredientMap;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -45,6 +48,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import org.jetbrains.annotations.NotNull;
 import vazkii.botania.api.recipe.*;
 import vazkii.botania.common.crafting.ModRecipeTypes;
 import vazkii.botania.common.item.ModItems;
@@ -72,7 +76,7 @@ public class BotaniaAddon {
 
     /** Make sure to divide raw mana by this amount before reporting to projectE. **/
     public static final double MANA_UNIT_TO_REPORT = 1_000_000.0 / EMC_PER_1_000_000_RAW_MANA;
-//    public static final int EMC_PER_SMALLEST_MANA_UNIT = EMC_PER_1_000_000_RAW_MANA / Fractions.GCD(1_000_000, EMC_PER_1_000_000_RAW_MANA);
+    //    public static final int EMC_PER_SMALLEST_MANA_UNIT = EMC_PER_1_000_000_RAW_MANA / Fractions.GCD(1_000_000, EMC_PER_1_000_000_RAW_MANA);
     public static final int EMC_PER_SMALLEST_MANA_UNIT = 1;
 
     public static final String MODID = "botania";
@@ -89,12 +93,13 @@ public class BotaniaAddon {
     private static class NSSMana implements NormalizedSimpleStack {
 
         public static String KEY = BotaniaAddon.MODID.toUpperCase() + "_MANA";
+        public static String TYPE = BotaniaAddon.MODID.toLowerCase() + "_mana";
 
         public static NSSMana INSTANCE = new NSSMana();
 
         @Override
         public String json() {
-            return KEY;
+            return KEY + "|" + TYPE;
         }
 
         @Override
@@ -122,9 +127,6 @@ public class BotaniaAddon {
         @Override
         public NSSInput getInput(R recipe) {
             long manaInput = Math.round(getRawManaInput(recipe) / MANA_UNIT_TO_REPORT);
-            if (manaInput <= 0) {
-                return super.getInput(recipe);
-            }
 
             List<Ingredient> ingredients = getIngredients(recipe);
             if (ingredients == null || ingredients.isEmpty()) {
@@ -141,7 +143,9 @@ public class BotaniaAddon {
                     return new NSSInput(ingredientMap, fakeGroupMap, false);
                 }
             }
-            ingredientMap.addIngredient(NSSMana.INSTANCE, (int)manaInput);
+            if (manaInput > 0) {
+                ingredientMap.addIngredient(NSSMana.INSTANCE, (int) manaInput);
+            }
             return new NSSInput(ingredientMap, fakeGroupMap, true);
         }
     }
@@ -180,6 +184,7 @@ public class BotaniaAddon {
         @Override
         int getRawManaInput(IManaInfusionRecipe recipe) {
             return recipe.getManaToConsume();
+//            return 0;
         }
 
         @Override
@@ -322,11 +327,11 @@ public class BotaniaAddon {
         @Override
         public void convert(CustomConversionBuilder builder) {
             builder.comment("Default conversions for Botania")
-                    .before(ModItems.pebble, 1)
-                    .before(ModItems.livingroot, 1)
-                    .before(ModItems.lifeEssence, 256)
-                    .before(ModItems.enderAirBottle, 1024)
-                    .before(NSSMana.INSTANCE, EMC_PER_SMALLEST_MANA_UNIT);
+                .before(ModItems.pebble, 1)
+                .before(ModItems.livingroot, 1)
+                .before(ModItems.lifeEssence, 256)
+                .before(ModItems.enderAirBottle, 1024)
+                .before(NSSMana.INSTANCE, EMC_PER_SMALLEST_MANA_UNIT);
         }
     }
 }
